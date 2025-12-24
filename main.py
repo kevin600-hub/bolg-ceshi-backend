@@ -22,7 +22,9 @@ class Post(BaseModel):
 
 # 模拟一些企业数据或博客文章
 fake_posts = [
-    {"id": 1, "title": "Script Lion 创业日志", "content": "Linking Intelligence, Scripting Reality."},
+    {"id": 1, 
+        "title": "致世界：狮子已觉醒", 
+        "content": "从零到一，从报错到 Ready。这是我独立开发的第一个全栈作品，它证明了只要不退缩，代码就是最强大的武器。"},
     {"id": 2, "title": "FastAPI + Next.js 全栈架构", "content": "这是目前独立开发者最强的生产力组合。"},
     {"id": 3, "title": "Render 部署指南", "content": "注意 Start Command 必须配置正确。"}
 ]
@@ -34,3 +36,4 @@ def read_root():
 @app.get("/api/posts", response_model=List[Post])
 def get_posts():
     return fake_posts
+
