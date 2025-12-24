@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import Pydantic
+from pydantic import BaseModel
 
 app = FastAPI()
 
@@ -24,4 +24,5 @@ def read_root():
 
 @app.get("/api/posts")
 def get_posts():
+
     return posts
