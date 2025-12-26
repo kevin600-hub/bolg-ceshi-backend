@@ -1,40 +1,48 @@
+import os
+from dotenv import load_dotenv
+from supabase import create_client, Client
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel  # 修复点：这里必须是 BaseModel，不能是 Pydantic
+from pydantic import BaseModel
 from typing import List
+
+# 1. 加载本地 .env
+load_dotenv()
+
+# 2. 获取环境变量
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+
+# 3. 初始化 Supabase 客户端 (这一步你之前漏掉了)
+supabase: Client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 app = FastAPI()
 
-# --- 关键：解决前端 Vercel 访问报错的 CORS 设置 ---
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 允许所有来源访问，上线后可以改成你具体的 Vercel 网址
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],  # 允许所有请求方式 (GET, POST 等)
+    allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# 定义数据结构
+# 定义数据结构 (保持不变)
 class Post(BaseModel):
     id: int
     title: str
     content: str
 
-# 模拟一些企业数据或博客文章
-fake_posts = [
-    {"id": 1, 
-        "title": "New Energy Calc Lion", 
-        "content": "Decoding New Energy through logic and code."},
-    {"id": 2, "title": "FastAPI + Next.js 全栈架构", "content": "这是目前独立开发者最强的生产力组合。"},
-    {"id": 3, "title": "Render 部署指南", "content": "注意 Start Command 必须配置正确。"}
-]
-
 @app.get("/")
 def read_root():
-    return {"status": "Lion Engine is Running"}
+    return {"status": "New Energy Calc Lion Engine is Running"}
 
+# --- 关键修改点：从数据库动态获取 ---
 @app.get("/api/posts", response_model=List[Post])
 def get_posts():
-    return fake_posts
-
-
+    # 使用 supabase 客户端去查询你刚才建立的 'post' 表
+    # .select("*") 表示拿走所有列
+    # .execute() 表示立即执行
+    response = supabase.table("post").select("*").execute()
+    
+    # 这里的 response.data 就是一个列表，格式正好符合你的 Post 模型
+    return response.data
